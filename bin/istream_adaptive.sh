@@ -3,18 +3,29 @@
 ###########################
 # Configuration
 ###########################
-NBQUALITIES=4
+NBQUALITIES=5
 declare -a QUALITIES
-#			VRATE	ARATE	XY
-QUALITIES=(	[1]="	110k	24k	416x234"	\
-		        [2]="	200k	24k	416x234"	\
-		        [3]="	400k	24k	416x234"	\
-		        [4]="	600k	24k	640x360"	\
+#			VRATE	ARATE	XY FRAMERATE
+QUALITIES=(	[1]="	110k	24k	416x234 25"	\
+		        [2]="	200k	24k	416x234 25" \
+		        [3]="	400k	24k	416x234 25"	\
+		        [4]="	600k	24k	640x360 25"	\
+		        [5]="	900k	24k	720x408 25"	\
 	  )
 
 ##########################
 # Code, don't modify
 ##########################
+
+STREAM="$1"
+HTTP_PATH="$5ram/sessions/"
+SEGDUR=10		# Length of Segments produced (between 10 and 30)
+SEGWIN=$6		# Amount of Segments to produce
+FFPATH=$7
+SEGMENTERPATH=$8
+SESSION=${9}
+FFMPEGLOG=${10}
+DIR=${11}
 
 function get_quality
 {
@@ -35,10 +46,17 @@ function get_quality
 		vrate=${vrate:0:-1}
 		arate=`echo $qualities | awk '{ print $2}'`
 		arate=${arate:0:-1}
-		echo $((vrate*1024 + vrate*102 + arate*1024 + arate*102))
+		echo $(((arate+vrate)*961 + 35900))
 		;;
 	"XY")
 		echo $qualities | awk '{ print $3}'
+		;;
+	"FRAMERATE")
+		echo $qualities | awk '{ print $4}'		
+		;;
+	"GOP_LENGTH")
+		framerate=`echo $qualities | awk '{ print $4}'`
+		echo $((framerate*$SEGDUR))
 		;;
         *)
 		echo "0"
@@ -53,15 +71,6 @@ function get_stream_name
 	echo "stream_`get_quality $streamid VRATE`_`get_quality $streamid ARATE`_`get_quality $streamid XY`"
 }
 
-STREAM="$1"
-HTTP_PATH="$5ram/sessions/"
-SEGDUR=10		# Length of Segments produced (between 10 and 30)
-SEGWIN=$6		# Amount of Segments to produce
-FFPATH=$7
-SEGMENTERPATH=$8
-SESSION=${9}
-FFMPEGLOG=${10}
-DIR=${11}
 
 CURDIR=`pwd`
 
@@ -113,9 +122,8 @@ echo start > $FFMPEGLOG
 FFMPEG_QUALITIES=""
 for ffid in `seq 1 $NBQUALITIES`
 do
-
 	FFMPEG_QUALITIES="${FFMPEG_QUALITIES} $COMMON_OPTION  $AUDIO_OPTION `get_quality $ffid ARATE` -s `get_quality $ffid XY` $VIDEO_OPTION \
-				-keyint_min 25 -r 25 -g 250 -b:v `get_quality $ffid VRATE` -bt `get_quality $ffid VRATE` -maxrate `get_quality $ffid VRATE` \
+				-keyint_min `get_quality $ffid FRAMERATE` -r `get_quality $ffid FRAMERATE` -g `get_quality $ffid GOP_LENGTH` -b:v `get_quality $ffid VRATE` -bt `get_quality $ffid VRATE` -maxrate `get_quality $ffid VRATE` \
 				-bufsize `get_quality $ffid VRATE` ./fifo${ffid}"
 
 done
