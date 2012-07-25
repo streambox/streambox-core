@@ -47,7 +47,7 @@
 	//////////////////////////////////////////////////////////////////
 
 	$maxencodingprocesses=10;				// Max simultaneous encoding processes
-	$adaptative=1;						// Enable adaptive streaming
+	$adaptive=5;						// Enable adaptive streaming
 	$debugadaptive=0;					// Adaptive streaming monitoring directly on the picture
 
 	// Misc
