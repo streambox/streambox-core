@@ -588,6 +588,18 @@ function stop_broadcast(session) {
     });
 }
 
+function isIOS(){
+
+    return (
+
+        (navigator.platform.indexOf("iPhone") != -1) ||
+
+        (navigator.platform.indexOf("iPod") != -1) ||
+
+        (navigator.platform.indexOf("iPad") != -1)
+
+    );
+}
 
 //Get server status & Play video
 function playvideo(session,name) {
@@ -604,7 +616,12 @@ function playvideo(session,name) {
 		if ( status == "ready" ) {
 
 			$('#streaming #thumbnail').html('');
-
+		   if (isIOS())
+		   {
+	                streaming.find('#player').html('<video id="videofeed" src="' + url + '" controls autoplay ></video><span rel="ready"></span>');
+		   }
+		   else
+		   {
 			playerWidth=window.innerWidth/2;
 			playerHeight=(playerWidth*480)/640;
 			
@@ -624,7 +641,7 @@ function playvideo(session,name) {
 						{ type:'flash', src:'swf/player.swf', config: { provider:'swf/adaptiveProvider.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
 						{ type:'html5', config: { file:'ram/sessions/session' +session +'/stream.m3u8' } }
 					]});
-
+		   }
 			return false;
 		}
 		else
