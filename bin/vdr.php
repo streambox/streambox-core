@@ -283,7 +283,7 @@ function vdrgetchancat($channame)
 
 function vdrgetchaninfo($channame)
 {
-	addlog("VDR: vdrgetchaninfo(channum=" .$channame .")");
+	addlog("VDR: vdrgetchaninfo(channame=" .$channame .")");
 
 	$info = array();
 

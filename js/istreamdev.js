@@ -455,7 +455,7 @@ function gen_streamchannel(channame,channumber) {
 	stream_channel = $('#streamchannel');
 	stream_channel.find('h1').html( '<img class="menuicon" src="img/tv.png" /> ' +channame);
 	stream_channel.find('#thumbnail').attr('src','logos/' + channame + ".png");
-	var dataString = "action=getChanInfo&chan=" + channame;
+	var dataString = "action=getChanInfo&chan=" + encodeURIComponent(channame);
 	//Json call to get tv program info
 	$.getJSON("bin/backend.php",
 			dataString,
