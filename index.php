@@ -111,7 +111,7 @@ ob_start();
 			<center><br>
 <?php
 			if ($adaptive)
-				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span>";
+				print "<span class=\"streamButton\"><a id=\"adaptive\" href=\"#\">Start streaming</a></span>";
 			else
 				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span><span class=\"streamButton\"><a id=\"3g\" href=\"#\" class=\"cube\"> 3G </a></span><span class=\"streamButton\"><a id=\"wifi\" href=\"#\" class=\"cube\">Wifi</a></span>";
 ?>

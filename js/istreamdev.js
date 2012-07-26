@@ -538,10 +538,10 @@ function gen_streaming(session) {
 				streaminfo += '<span class="epgtime_next">' + stream.next_time + '</span></li>';
 				streaming.find('ul[class="streaminfo"]').html(streaminfo);
 				}
-			else if (stream.type == "rec") 
+			else if (stream.type == "rec")
 				{
-				streaming.find('h1').html('<img class="menuicon" src="img/record.png" onerror="this.src=\'img/nologoREC.png\'" /> ' + stream.name );
-				streaming.find('$thumbnail').css('width', '90px');
+/*				streaming.find('h1').html('<img class="menuicon" src="img/record.png" onerror="this.src=\'img/nologoREC.png\'" /> ' + stream.name ); 
+				streaming.find('$thumbnail').css('width', '90px');*/
 				var streaminfo = '<li><span class="name_now">' + stream.name + '</span>';
 				streaminfo += '<span class="epgtime_now">Recorded: ' + stream.recorded + '</span>';
 				streaminfo += '<span class="desc_now">' + stream.desc + '</span></li>';
