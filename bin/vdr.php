@@ -361,6 +361,8 @@ function vdrgetfullepgat($channel, $at, $programs, $requestedday)
 
 		for ($j=0; $j<count($channels); $j++)
 		{
+			$programscounter=0;
+
 			// Create a new chan entry
 			$chanentry = array();
 			$chanentry['name'] = $channels[$j]['name'];
@@ -402,7 +404,7 @@ function vdrgetfullepgat($channel, $at, $programs, $requestedday)
 								$validepg = 0;
 							break;
 						default:
-							if (($endtime > $at) && ($starttime < $at))
+							if (($endtime > $at) && ($programscounter < $programs))
 								$validepg = 1;
 							else
 								$validepg = 0;
@@ -437,10 +439,6 @@ function vdrgetfullepgat($channel, $at, $programs, $requestedday)
 						$programscounter++;
 
 						$validepg = 0;
-
-						// Only 1
-						if ($programs != "day" && $programs != "all")
-							$k=count($_SESSION['epg' .$channels[$j]['name']]);
 					}
 					continue;
 				}

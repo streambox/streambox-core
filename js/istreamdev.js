@@ -1272,7 +1272,7 @@ function get_epgdetails(channum,startingtime,day) {
 	epg_details.find('div[rel="dataholder"] span[rel="date"]').html(date);
 	epg_details.find('div[rel="dataholder"] span[rel="stime"]').html(stime);
 	epg_details.find('div[rel="dataholder"] span[rel="etime"]').html(etime);
-	epg_details.find('div[rel="dataholder"] span[rel="url"]').html(channame);
+	epg_details.find('div[rel="dataholder"] span[rel="url"]').html(name);
 	if ( running == "yes" ) {
 		if ( adaptive )
 	                epg_details.find('#epgdetails_buttons').html('<span class="streamButton"><a id="adaptive" href="#" class="dissolve">Start streaming</a></span><span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');
