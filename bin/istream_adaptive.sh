@@ -6,11 +6,11 @@
 NBQUALITIES=5
 declare -a QUALITIES
 #			VRATE	ARATE	XY FRAMERATE
-QUALITIES=(	[1]="	110k	32k	416x234 15"	\
-		        [2]="	200k	32k	416x234 25" \
-		        [3]="	400k	32k	416x234 25"	\
+QUALITIES=(	[1]="	110k	48k	416x234 15"	\
+		        [2]="	200k	48k	416x234 25" \
+		        [3]="	400k	48k	416x234 25"	\
 		        [4]="	600k	48k	640x360 25"	\
-		        [5]="	900k	64k	720x408 25"	\
+		        [5]="	4000k	48k	720x408 25"	\
 	  )
 
 ##########################
@@ -18,6 +18,8 @@ QUALITIES=(	[1]="	110k	32k	416x234 15"	\
 ##########################
 
 STREAM="$1"
+# removing spaces ...
+STREAM=`echo "$STREAM"|sed 's/ /%20/g'`
 HTTP_PATH="$5ram/sessions/"
 SEGDUR=10		# Length of Segments produced (between 10 and 30)
 SEGWIN=$6		# Amount of Segments to produce
@@ -132,7 +134,7 @@ if [ ! -z "$DIR" ]
 then
 	$CURDIR/cat_recording.sh $DIR | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
 else
-        wget "$STREAM" -O - | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
+	$FFPATH -i "$STREAM" -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
 fi
 
 sleep 1
