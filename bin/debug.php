@@ -16,21 +16,24 @@ function addlog($log)
 	fclose($debughandle);
 }
 
-function addstreaminglog($log)
+function addmonitoringlog($log)
 {
-        global $debug, $debugfile, $monitoring, $monitoringfile;
+  global $monitoring, $monitoringfile,$monitoringemail;
 
-	if (!$monitoring)
-		return;
+  if (!$monitoring)
+  return;
 
-        $newlog = date("Y/m/d H:i:s -> ") .$log ."\n";
+  if(isset($monitoringemail))
+    mail($monitoringemail, $log, "", "From: ".$monitoringemail );
 
-        $debughandle = fopen($monitoringfile, 'a');
-        if (!$debughandle)
-                return;
-        fwrite($debughandle, $newlog);
+  $newlog = date("Y/m/d H:i:s -> ") .$log ."\n";
 
-        fclose($debughandle);
+  $debughandle = fopen($monitoringfile, 'a');
+  if (!$debughandle)
+  return;
+  fwrite($debughandle, $newlog);
+
+  fclose($debughandle);
 }
 
 

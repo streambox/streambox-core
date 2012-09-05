@@ -4,7 +4,9 @@ function sessioncreate($type, $url, $mode)
 	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
 	global $username, $vdrstreamdev, $vdrrecpath, $adaptive;
 
-	addlog("Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")");
+  $log = "user [" .$username ."]"." Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")";
+	addlog($log);
+	addmonitoringlog($log);
 
 	// Check url
 	if (!isurlvalid($url, $type))
@@ -52,9 +54,10 @@ function sessioncreate($type, $url, $mode)
 	$nbencprocess = exec("find ../ram/sessions/ -name segmenter.pid | wc | awk '{ print $1 }'");
 	if ($nbencprocess >= $maxencodingprocesses)
 	{
-		addlog("Error: Cannot create sesssion, too much sessions already encoding");
-		addstreaminglog("iStreamdev: cannot create sesssion, too much sessions already encoding");
-		return "session: Cannot create sesssion, too much sessions already encoding";
+	  $log= "Error: Cannot create sesssion, too much sessions already encoding";
+		addlog($log);
+		addmonitoringlog($log);
+		return $log;
 	}
 
 	// Get a free session
@@ -68,9 +71,10 @@ function sessioncreate($type, $url, $mode)
 
 	if ($i == 1000)
 	{
-		addlog("Error: Cannot find a new session name");
-		addstreaminglog("iStreamdev: cannot find a new session name");
-		return "session: Cannot find a new session name";
+	  $log = "Error: Cannot find a new session name";
+		addlog($log);
+		addmonitoringlog($log);
+		return $log;
 	}
 
 	// Default
@@ -232,8 +236,9 @@ function sessiongetinfo($session)
 function sessiondeletesingle($session)
 {
 	global $username;
-
-	addlog("Deleting session " .$session);
+  $log = "user [" .$username ."]"." Deleting session " .$session;
+	addlog($log);
+	addmonitoringlog($log);
 
 	// Remove link
 	exec("rm ../ram/" .$username ."/" .$session);

@@ -4,40 +4,44 @@ global $username;
 
 session_start();
 
-list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':' , base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
 $username=$_SERVER['PHP_AUTH_USER'];
+$password=$_SERVER['PHP_AUTH_PW'];
+$remote_ip = $_SERVER['REMOTE_ADDR'];
+$remote_host= gethostbyaddr($remote_ip);
 
 if ($_SESSION['authorized'] == false)
 {
-	addlog("AUTH: connection attempt with " .$_SERVER['PHP_AUTH_USER'] ."/" .$_SERVER['PHP_AUTH_PW']);
+  // checkup login and password
+  if (isset($username) && isset($password))
+  {
+    if($password == sqlgetuserinfo("password",$username))
+    {
+      $_SESSION['authorized'] = true;
+      $log = "user [" .$username ."] successfully identified! IP/HOST=[" .$remote_ip ."/" .$remote_host ."]";
+      addlog($log);
+      addmonitoringlog($log);
 
-	// checkup login and password
-	if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW']))
-	{
-		if($_SERVER['PHP_AUTH_PW'] == sqlgetuserinfo("password", $_SERVER['PHP_AUTH_USER']))
-		{
-			$_SESSION['authorized'] = true;
-			addlog("AUTH: user [" .$username ."] successfully identified!");
-			addstreaminglog("iStreamDev user [" .$username ."] successfully identified!");
-
-			sqlsetuserstat("last_connection", $username, date("Y/m/d H:i:s"));
-			$num=sqlgetuserstat("num_connections", $username);
-			$num++;
-			sqlsetuserstat("num_connections", $username, $num);
-		}
-	}
-
-	// login
-	if (!$_SESSION['authorized'])
-	{
-		addlog("AUTH: identification failed: " .$_SERVER['PHP_AUTH_USER'] ."/" .$_SERVER['PHP_AUTH_PW']);
-		addstreaminglog("iStreamDev identification failed: " .$_SERVER['PHP_AUTH_USER'] ."/" .$_SERVER['PHP_AUTH_PW']);
-
-		header('WWW-Authenticate: Basic Realm="Login please"');
-		header('HTTP/1.0 401 Unauthorized');
-		echo "Incorrect user/password";
-		exit;
-	}
+      sqlsetuserstat("last_connection", $username, date("Y/m/d H:i:s"));
+      $num=sqlgetuserstat("num_connections", $username);
+      $num++;
+      sqlsetuserstat("num_connections", $username, $num);
+    }
+    else
+    {
+      $log = "Identification failed: " .$username ."/" .$password ."IP/HOST=[" .$remote_ip ."/" .$remote_host ."]";
+      addlog($log);
+      addmonitoringlog($log);
+      header('WWW-Authenticate: Basic Realm="Login please"');
+      header('HTTP/1.0 401 Unauthorized');
+      echo "Incorrect user/password";
+      exit;
+    }
+  }
+  else
+  {
+    header('WWW-Authenticate: Basic Realm="Login please"');
+    header('HTTP/1.0 401 Unauthorized');
+  }
 }
 
 ?>
