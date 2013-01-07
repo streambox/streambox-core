@@ -209,7 +209,7 @@ function vdrgetchannum($chan)
 		$_SESSION['channels'] = vdrsendcommand("LSTC");
 
 	// Get channel number
-	$chans = preg_grep(quotemeta('"'.$chan.';|'.$chan.':"'), $_SESSION['channels']);
+	$chans = preg_grep(quotemeta('" '.$chan.';| '.$chan.':"'), $_SESSION['channels']);
 
 	$chans = explode(" ", $chans[key($chans)]);
 	$channum = $chans[0];
