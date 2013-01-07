@@ -7,7 +7,6 @@ session_start();
 $username=$_SERVER['PHP_AUTH_USER'];
 $password=$_SERVER['PHP_AUTH_PW'];
 $remote_ip = $_SERVER['REMOTE_ADDR'];
-$remote_host= gethostbyaddr($remote_ip);
 
 if ($_SESSION['authorized'] == false)
 {
@@ -17,7 +16,7 @@ if ($_SESSION['authorized'] == false)
     if($password == sqlgetuserinfo("password",$username))
     {
       $_SESSION['authorized'] = true;
-      $log = "user [" .$username ."] successfully identified! IP/HOST=[" .$remote_ip ."/" .$remote_host ."]";
+      $log = "user [" .$username ."] successfully identified! IP=[" .$remote_ip ."]";
       addlog($log);
       addmonitoringlog($log);
 
@@ -28,7 +27,7 @@ if ($_SESSION['authorized'] == false)
     }
     else
     {
-      $log = "Identification failed: " .$username ."/" .$password ."IP/HOST=[" .$remote_ip ."/" .$remote_host ."]";
+      $log = "Identification failed: " .$username ."/" .$password ."IP=[" .$remote_ip ."]";
       addlog($log);
       addmonitoringlog($log);
       header('WWW-Authenticate: Basic Realm="Login please"');
