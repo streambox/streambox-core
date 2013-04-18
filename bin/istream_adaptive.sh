@@ -1,40 +1,28 @@
 #!/bin/bash
 
-###########################
-# Configuration
-###########################
-NBQUALITIES=5
-declare -a QUALITIES
-#			VRATE	ARATE	XY FRAMERATE
-QUALITIES=(	[1]="	110k	48k	416x234 15"	\
-		        [2]="	200k	48k	416x234 25" \
-		        [3]="	400k	48k	416x234 25"	\
-		        [4]="	600k	48k	640x360 25"	\
-		        [5]="	900k	48k	720x408 25"	\
-	  )
-
 ##########################
 # Code, don't modify
 ##########################
 
-STREAM="$1"
-# removing spaces ...
-STREAM=`echo "$STREAM"|sed 's/ /%20/g'`
-HTTP_PATH="$5ram/sessions/"
-SEGDUR=10		# Length of Segments produced (between 10 and 30)
-SEGWIN=$6		# Amount of Segments to produce
-FFPATH=$7
-SEGMENTERPATH=$8
-SESSION=${9}
-FFMPEGLOG=${10}
-DIR=${11}
+STREAM=`echo "$1" | sed 's/ /%20/g'`
+HTTP_PATH="$2ram/sessions/"
+SEGWIN=$3		# Amount of Segments to produce
+FFPATH=$4
+SEGMENTERPATH=$5
+SESSION=$6
+FFMPEGLOG=$7
+NBQUALITIES=$8
+
+SEGDUR=10               # Length of Segments produced (between 10 and 30)
+CMDLINEARGS=("$@")
 
 function get_quality
 {
 	qualityid=$1
+	qparamindex=$((qualityid+7))
 	qualityname=$2
 
-	qualities=${QUALITIES[$qualityid]}
+	qualities="${CMDLINEARGS[$qparamindex]}"
 
 	case "$qualityname" in
 	"VRATE")
@@ -130,11 +118,11 @@ do
 
 done
 
-if [ ! -z "$DIR" ]
+if [ "${STREAM:0:4}" == "http" ]
 then
-	$CURDIR/cat_recording.sh $DIR | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
-else
 	$FFPATH -i "$STREAM" -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
+else
+	$CURDIR/cat_recording.sh "$STREAM" | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
 fi
 
 sleep 1

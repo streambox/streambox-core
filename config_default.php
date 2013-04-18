@@ -37,13 +37,15 @@
 	$videosource='/mnt/media/movies/';				// Video files directory
 	$audiosource='/mnt/media/music/';				// Audio files directory
 
-	/////////////////////////////////////////////////////////////////
-	// Encoding: define encodings for non adaptative streaming.
-	// Adaptative streaming configuration is in istream_adaptative.sh
-	//			Name		Video	Audio	Resolution
-	$quality=array	(	'edge'	=>	'128k	64k	240x160',
-				'3g'	=>	'350k	64k	408x272',
-				'wifi'	=>	'512k	128k	480x320');
+        /////////////////////////////////////////////////////////////////
+        // Encoding: define apaptive streaming engcoding
+        //                      Name            Video   Audio   Resolution      Framerate
+        $qualities=array(       '1'     =>      '110k   48k     416x234         15',
+                                '2'     =>      '200k   48k     416x234         25',
+                                '3'     =>      '400k   48k     416x234         25',
+                                '4'     =>      '600k   48k     640x360         25',
+                                '5'     =>      '900k   48k     720x408         25'
+                        );
 	//////////////////////////////////////////////////////////////////
 
 	$maxencodingprocesses=10;				// Max simultaneous encoding processes

@@ -1,10 +1,11 @@
 <?php
 function sessioncreate($type, $url, $mode)
 {
-	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
+	global $httppath, $ffmpegpath, $segmenterpath, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
 	global $username, $vdrstreamdev, $vdrrecpath;
+	global $qualities;
 
-  $log = "user [" .$username ."]"." Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")";
+	$log = "user [" .$username ."]"." Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")";
 	addlog($log);
 	addmonitoringlog($log);
 
@@ -77,19 +78,6 @@ function sessioncreate($type, $url, $mode)
 		return $log;
 	}
 
-	// Default
-	$qparams = $quality['3g'];
-
-	// Get parameters
-	foreach ($quality as $qn => $qp)
-	{
-		if ($qn == $mode)
-		{
-			$qparams = $qp;
-			break;
-		}
-	}
-
 	// Create session
 	addlog("Creating new session dir ram/sessions/" .$session);
 	exec('mkdir ../ram/sessions/' .$session);
@@ -112,17 +100,42 @@ function sessioncreate($type, $url, $mode)
 	switch ($type)
 	{
 		case 'tv':
-			$cmd = "" .$encodingscript ." \"" .$vdrstreamdev .$url ."\" " .$qparams ." " .$httppath ." 5 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
+			$scripturl = $vdrstreamdev .$url;
+			$scriptnbsegments = 5;
 			break;
 		case 'rec':
-			$cmd = "" .$encodingscript ." - " .$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"" .$vdrrecpath .$url ."\" >/dev/null 2>&1 &";
+			$scripturl = $vdrrecpath .$url;
+			$scriptnbsegments = 1260;
 			break;
 		case 'vid':
-			$cmd = "" .$encodingscript ." " .$url ." ".$qparams ." " .$httppath ." 1260 " .$ffmpegpath ." " .$segmenterpath ." " .$session ." \"" .$ffdbg ."\" \"\" >/dev/null 2>&1 &";
-                        break;
-		default:
-			$cmd = "";
+			$scripturl = $url;
+			$scriptnbsegments = 1260;
+			break;
 	}
+	// Generate command
+
+	// Script  name
+	$cmd  = $encodingscript ." ";
+	// URL to play
+	$cmd .= "\"" .$scripturl ."\" ";
+	// HTTP path
+	$cmd .= $httppath ." ";
+	// Nb of segments
+	$cmd .= $scriptnbsegments ." ";
+	// FFmpeg path
+	$cmd .= $ffmpegpath ." ";
+	// Segmenter path
+	$cmd .= $segmenterpath ." ";
+	// Session name
+	$cmd .= $session ." ";
+	// Debug
+	$cmd .= $ffdbg ." ";
+	// Qualities
+	$cmd .= count($qualities) ." ";
+	foreach ($qualities as $qname => $qparams)
+		$cmd .= "\" " .$qparams ."\" ";
+	// Fork
+	$cmd .= ">/dev/null 2>&1 &";
 
 	addlog("Sending encoding command: " .$cmd);
 
@@ -276,7 +289,7 @@ function sessiondeletesingle($session)
 
 function getstreamingstatus($session)
 {
-	global $maxencodingprocesses, $httppath;
+	global $maxencodingprocesses, $httppath, $qualities;
 
 	$status = array();
 
@@ -295,7 +308,7 @@ function getstreamingstatus($session)
 
     // it is better to check for playlist availability as they are created after first complete ts fragment is available
     // in case of adaptive streaming, 1 playlist is created automatically
-		if (count(glob($path . '/*.m3u8')) <= 5)
+		if (count(glob($path . '/*.m3u8')) <= count($qualities))
 		{
 			if (!is_pid_running($path .'/ffmpeg.pid') || !is_pid_running($path .'/segmenter.pid'))
 			{
