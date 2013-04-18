@@ -2,7 +2,7 @@
 function sessioncreate($type, $url, $mode)
 {
 	global $httppath, $ffmpegpath, $segmenterpath, $quality, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
-	global $username, $vdrstreamdev, $vdrrecpath, $adaptive;
+	global $username, $vdrstreamdev, $vdrrecpath;
 
   $log = "user [" .$username ."]"." Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")";
 	addlog($log);
@@ -108,10 +108,7 @@ function sessioncreate($type, $url, $mode)
 
 	// Start encoding
 	$url = str_replace("\\'", "'", $url);
-	if ($adaptive)
-		$encodingscript="./istream_adaptive.sh";
-	else
-		$encodingscript="./istream.sh";
+	$encodingscript="./istream_adaptive.sh";
 	switch ($type)
 	{
 		case 'tv':
@@ -279,7 +276,7 @@ function sessiondeletesingle($session)
 
 function getstreamingstatus($session)
 {
-	global $maxencodingprocesses, $httppath, $adaptive;
+	global $maxencodingprocesses, $httppath;
 
 	$status = array();
 
@@ -296,9 +293,9 @@ function getstreamingstatus($session)
 		// Get stream info
 		list($type, $mode, $url, $channame) = readinfostream($session);
 
-    /* it is better to check for playlist availability as they are created after first complete ts fragment is available
-       in case of adaptive streaming, 1 playlist is created automatically */
-		if (count(glob($path . '/*.m3u8')) <= $adaptive)
+    // it is better to check for playlist availability as they are created after first complete ts fragment is available
+    // in case of adaptive streaming, 1 playlist is created automatically
+		if (count(glob($path . '/*.m3u8')) <= 5)
 		{
 			if (!is_pid_running($path .'/ffmpeg.pid') || !is_pid_running($path .'/segmenter.pid'))
 			{

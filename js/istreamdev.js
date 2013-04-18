@@ -62,7 +62,6 @@ $(document).ready(function(e){
 				video_path = data.video_path;
 				audio_path = data.audio_path;
 				epg_maxdays = data.epg_maxdays;
-				adaptive = data.adaptive;
 				debugadaptive = data.debugadaptive;
 				addVdr();
 				showStatus( 0,"Getting channels list" );
@@ -1274,10 +1273,7 @@ function get_epgdetails(channum,startingtime,day) {
 	epg_details.find('div[rel="dataholder"] span[rel="etime"]').html(etime);
 	epg_details.find('div[rel="dataholder"] span[rel="url"]').html(name);
 	if ( running == "yes" ) {
-		if ( adaptive )
-	                epg_details.find('#epgdetails_buttons').html('<span class="streamButton"><a id="adaptive" href="#" class="dissolve">Start streaming</a></span><span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');
-                else
-                        epg_details.find('#epgdetails_buttons').html('<span class="streamButton"><a id="edge" href="#">Edge</a></span><span class="streamButton"><a id="3g" href="#" class="dissolve"> 3G </a></span><span class="streamButton"><a id="wifi" href="#" class="dissolve">Wifi</a></span><span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');
+                epg_details.find('#epgdetails_buttons').html('<span class="streamButton"><a id="adaptive" href="#" class="dissolve">Start streaming</a></span><span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');
 	} else {
 		epg_details.find('#epgdetails_buttons').html('<span class="recButton"><a id="rec" href="#" class="dissolve">Rec.</a></span>');
 	}

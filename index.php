@@ -78,12 +78,7 @@ ob_start();
 			</ul>
 			<center>
 			<br>
-<?php
-			if ($adaptive)
-				print "<span class=\"streamButton\"><a id=\"adaptive\" href=\"#\">Start streaming</a></span><span class=\"recButton\"><a id=\"rec\" href=\"#\" class=\"cube\">Rec.</a></span>";
-			else
-				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span><span class=\"streamButton\"><a id=\"3g\" href=\"#\" class=\"cube\"> 3G </a></span><span class=\"streamButton\"><a id=\"wifi\" href=\"#\" class=\"cube\">Wifi</a></span><span class=\"recButton\"><a id=\"rec\" href=\"#\" class=\"cube\">Rec.</a></span>";
-?>
+			<span class="streamButton"><a id="adaptive" href="#">Start streaming</a></span><span class="recButton"><a id="rec" href="#" class="cube">Rec.</a></span>
 			<br><br>
 			</center>
 			<div rel="dataholder" style="visibility:hidden">
@@ -109,12 +104,7 @@ ob_start();
 				</li>
 			</ul>
 			<center><br>
-<?php
-			if ($adaptive)
-				print "<span class=\"streamButton\"><a id=\"adaptive\" href=\"#\">Start streaming</a></span>";
-			else
-				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span><span class=\"streamButton\"><a id=\"3g\" href=\"#\" class=\"cube\"> 3G </a></span><span class=\"streamButton\"><a id=\"wifi\" href=\"#\" class=\"cube\">Wifi</a></span>";
-?>
+			<span class="streamButton"><a id="adaptive" href="#">Start streaming</a></span>
 			<br><br>
 			</center>
 			<div rel="dataholder" style="visibility:hidden">
@@ -137,12 +127,7 @@ ob_start();
 				</li>
 			</ul>
 			<center><br>
-<?php
-			if ($adaptive)
-				print "<span class=\"streamButton\"><a id=\"adaptive\" href=\"#\">Start streaming</a></span>";
-			else
-				print "<span class=\"streamButton\"><a id=\"edge\" href=\"#\">Edge</a></span><span class=\"streamButton\"><a id=\"3g\" href=\"#\" class=\"cube\"> 3G </a></span><span class=\"streamButton\"><a id=\"wifi\" href=\"#\" class=\"cube\">Wifi</a></span>";
-?>
+			<span class="streamButton"><a id="adaptive" href="#">Start streaming</a></span>
 			<br><br>
 			</center>
 			<div rel="dataholder" style="visibility:hidden">
