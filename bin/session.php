@@ -1,7 +1,7 @@
 <?php
 function sessioncreate($type, $url, $mode)
 {
-	global $httppath, $ffmpegpath, $segmenterpath, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
+	global $httppath, $ffmpegpath, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
 	global $username, $vdrstreamdev, $vdrrecpath;
 	global $qualities;
 
@@ -52,7 +52,7 @@ function sessioncreate($type, $url, $mode)
 
 
 	// Check that the max number of session is not reached yet
-	$nbencprocess = exec("find ../ram/sessions/ -name segmenter.pid | wc | awk '{ print $1 }'");
+	$nbencprocess = exec("find ../ram/sessions/ -name ffmpeg.pid | wc | awk '{ print $1 }'");
 	if ($nbencprocess >= $maxencodingprocesses)
 	{
 	  $log= "Error: Cannot create sesssion, too much sessions already encoding";
@@ -118,14 +118,10 @@ function sessioncreate($type, $url, $mode)
 	$cmd  = $encodingscript ." ";
 	// URL to play
 	$cmd .= "\"" .$scripturl ."\" ";
-	// HTTP path
-	$cmd .= $httppath ." ";
 	// Nb of segments
 	$cmd .= $scriptnbsegments ." ";
 	// FFmpeg path
 	$cmd .= $ffmpegpath ." ";
-	// Segmenter path
-	$cmd .= $segmenterpath ." ";
 	// Session name
 	$cmd .= $session ." ";
 	// Debug
@@ -268,19 +264,6 @@ function sessiondeletesingle($session)
 	$ffmpegpid=is_pid_running($ram ."ffmpeg.pid");
 	if ( $ffmpegpid != 0 )
 		$cmd .= " kill -9 " .$ffmpegpid ."; rm " .$ram ."ffmpeg.pid; ";
-
-	// Then kill segmenter
-	exec('cat ' .$ram .'segmenter.pid', $output);
-	$nbsegmenterpid=count($output);
-	for ($i=0; $i<$nbsegmenterpid; $i++)
-	{
-		$segmenterpid=is_pid_running($ram ."segmenter.pid", $i+1);
-		if ($segmenterpid != 0)
-			$cmd .= "kill -9 " .$segmenterpid ."; ";
-	}
-
-	$cmd .= "rm " .$ram ."segmenter.pid; ";
-
 	addlog("Sending session kill command: " .$cmd);
 
 	$cmd .= "rm -rf " .$ram;
@@ -310,7 +293,7 @@ function getstreamingstatus($session)
     // in case of adaptive streaming, 1 playlist is created automatically
 		if (count(glob($path . '/*.m3u8')) <= count($qualities))
 		{
-			if (!is_pid_running($path .'/ffmpeg.pid') || !is_pid_running($path .'/segmenter.pid'))
+			if (!is_pid_running($path .'/ffmpeg.pid'))
 			{
 				$status['status'] = "error";
 				$status['message'] = "<b>Error: streaming could not start correclty</b>";
@@ -339,13 +322,6 @@ function getstreamingstatus($session)
 				$status['message'] .= "Y";
 			else
 				$status['message'] .= "N";
-			$status['message'] .= ", S:";
-			if (is_pid_running($path .'/segmenter.pid'))
-			{
-				$status['message'] .= "Y";
-			}
-			else
-				$status['message'] .= "N";
 			$status['message'] .= ")";
 		}
 		else
@@ -356,7 +332,7 @@ function getstreamingstatus($session)
 
 			$status['message'] .= "<br>  * Quality: <i>" .$mode ."</i>";
 			$status['message'] .= "<br>  * Status: ";
-			if (is_pid_running($path .'/segmenter.pid'))
+			if (is_pid_running($path .'/ffmpeg.pid'))
 				$status['message'] .= "<i>live streaming</i>";
 			else
 				$status['message'] .= "<i>fully encoded</i>";
@@ -408,15 +384,6 @@ function sessiongetstatus($session, $prevmsg)
 
 			if (is_pid_running('../ram/sessions/' .$session .'/ffmpeg.pid'))
 				$status['message'] .= "<i>running</i>";
-			else
-				$status['message'] .= "<i>stopped</i>";
-			$status['message'] .= "<br>  * Segmenter: ";
-
-			if (is_pid_running('../ram/sessions/' .$session .'/segmenter.pid'))
-			{
-				$status['message'] .= "<i>running</i> (";
-				$status['message'] .= count(glob('../ram/sessions/' .$session .'/*.ts')) ."/3)</i>";
-			}
 			else
 				$status['message'] .= "<i>stopped</i>";
 
@@ -474,7 +441,7 @@ function sessiongetlist()
 				$newsession['name'] = "Error: " .$newsession['name'];
 
 			// Check if encoding
-			if (is_pid_running('../ram/sessions/' .$session .'/segmenter.pid') && ($status['status'] != "error"))
+			if (is_pid_running('../ram/sessions/' .$session .'/ffmpeg.pid') && ($status['status'] != "error"))
 				$newsession['encoding'] = 1;
 			else
 				$newsession['encoding'] = 0;

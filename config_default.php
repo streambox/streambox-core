@@ -53,5 +53,4 @@
 
 	// Misc
 	$ffmpegpath='/usr/bin/ffmpeg';		//path to ffmpeg binary
-	$segmenterpath='/usr/bin/segmenter';	//path to segmenter binary
 ?>
