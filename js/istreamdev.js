@@ -1,4 +1,4 @@
-﻿//INIT
+//INIT
 jQT = new $.jQTouch({
 	icon: 'img/istreamdev.png',
 	addGlossToIcon: true,
@@ -628,6 +628,7 @@ function playvideo(session,name) {
 				jwplayer("mediaplayer").setup({
 					width: playerWidth,height: playerHeight,
 					autostart: 'true',
+					skin: "swf/newtubedark.zip",
 					plugins: { 'swf/qualitymonitor.swf' : {} },
 					modes: [
 						{ type:'flash', src:'swf/player.swf', config: { provider:'swf/HLSProvider5.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
@@ -636,6 +637,7 @@ function playvideo(session,name) {
 			else
 				jwplayer("mediaplayer").setup({
 					width: playerWidth,height: playerHeight,
+					skin: "swf/newtubedark.zip",
 					modes: [
 						{ type:'flash', src:'swf/player.swf', config: { provider:'swf/HLSProvider5.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
 						{ type:'html5', config: { file:'ram/sessions/session' +session +'/stream.m3u8' } }
