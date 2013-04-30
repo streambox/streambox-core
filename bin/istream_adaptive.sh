@@ -109,22 +109,24 @@ for ffid in `seq 1 $NBQUALITIES`
 do
 	FFMPEG_QUALITIES="${FFMPEG_QUALITIES} $COMMON_OPTION  $AUDIO_OPTION `get_quality $ffid ARATE` -s `get_quality $ffid XY` $VIDEO_OPTION \
 				-keyint_min `get_quality $ffid FRAMERATE` -r `get_quality $ffid FRAMERATE` -g `get_quality $ffid GOP_LENGTH` -b:v `get_quality $ffid VRATE` -bt `get_quality $ffid VRATE` -maxrate `get_quality $ffid VRATE` \
-				-bufsize `get_quality $ffid VRATE` -f ssegment -segment_list `get_playlist_name $ffid` -segment_time $SEGDUR `get_stream_name $ffid`"
+				-bufsize `get_quality $ffid VRATE` -f ssegment -segment_list `get_playlist_name $ffid` -segment_time $SEGDUR "
 
 # add specific option for live playlist
 if [ "${STREAM:0:4}" == "http" ]
 then
-   FFMPEG_QUALITIES="${FFMPEG_QUALITIES} -segment_list_flags +live -segment_list_size $SEGWIN"
+   FFMPEG_QUALITIES="${FFMPEG_QUALITIES} -segment_list_flags +live -segment_list_size $SEGWIN "
 fi
+
+FFMPEG_QUALITIES="${FFMPEG_QUALITIES} `get_stream_name $ffid` "
 done
 
-echo $FFMPEG_QUALITIES 2>$FFMPEGLOG
+echo $FFMPEG_QUALITIES >$FFMPEGLOG
 
 if [ "${STREAM:0:4}" == "http" ]
 then
-	$FFPATH -i "$STREAM" -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
+	$FFPATH -i "$STREAM" -y $FFMPEG_QUALITIES 2>>$FFMPEGLOG &
 else
-	$CURDIR/cat_recording.sh "$STREAM" | $FFPATH -i - -y $FFMPEG_QUALITIES 2>$FFMPEGLOG &
+	$CURDIR/cat_recording.sh "$STREAM" | $FFPATH -i - -y $FFMPEG_QUALITIES 2>>$FFMPEGLOG &
 fi
 
 sleep 1
