@@ -62,7 +62,6 @@ $(document).ready(function(e){
 				video_path = data.video_path;
 				audio_path = data.audio_path;
 				epg_maxdays = data.epg_maxdays;
-				debugadaptive = data.debugadaptive;
 				addVdr();
 				showStatus( 0,"Getting channels list" );
 				gen_formchanlist();
@@ -624,24 +623,15 @@ function playvideo(session,name) {
 			playerWidth=window.innerWidth/2;
 			playerHeight=(playerWidth*480)/640;
 			
-			if (debugadaptive)
-				jwplayer("mediaplayer").setup({
-					width: playerWidth,height: playerHeight,
-					autostart: 'true',
-					skin: "swf/newtubedark.zip",
-					plugins: { 'swf/qualitymonitor.swf' : {} },
-					modes: [
-						{ type:'flash', src:'swf/player.swf', config: { provider:'swf/HLSProvider5.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
-						{ type:'html5', config: { file:'ram/sessions/session' +session +'/stream.m3u8' } }
-					]});
-			else
-				jwplayer("mediaplayer").setup({
-					width: playerWidth,height: playerHeight,
-					skin: "swf/newtubedark.zip",
-					modes: [
-						{ type:'flash', src:'swf/player.swf', config: { provider:'swf/HLSProvider5.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
-						{ type:'html5', config: { file:'ram/sessions/session' +session +'/stream.m3u8' } }
-					]});
+			jwplayer("mediaplayer").setup({
+				width: playerWidth,height: playerHeight,
+				autostart: 'true',
+				skin: "swf/newtubedark.zip",
+				plugins: { 'swf/qualitymonitor.swf' : {} },
+				modes: [
+					{ type:'flash', src:'swf/player.swf', config: { provider:'swf/HLSProvider5.swf', file:'ram/sessions/session' +session +'/stream.m3u8' } },
+					{ type:'html5', config: { file:'ram/sessions/session' +session +'/stream.m3u8' } }
+				]});
 		   }
 			return false;
 		}
