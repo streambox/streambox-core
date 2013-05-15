@@ -296,7 +296,7 @@ function getstreamingstatus($session)
 			if (!is_pid_running($path .'/ffmpeg.pid'))
 			{
 				$status['status'] = "error";
-				$status['message'] = "<b>Error: streaming could not start correclty</b>";
+				$status['message'] = "<b>Error: streaming could not start correctly</b>";
 			}
 			else
 			{
