@@ -3,7 +3,7 @@ function sessioncreate($type, $url, $mode)
 {
 	global $httppath, $ffmpegpath, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
 	global $username, $streamingurl, $recpath;
-	global $qualities;
+	global $qualities, $remoteapp;
 
 	$log = "user [" .$username ."]"." Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")";
 	addlog($log);
@@ -18,10 +18,14 @@ function sessioncreate($type, $url, $mode)
         {
                 case 'tv':
                         $channame = $url;
-                        $channum = vdrgetchannum($channame);
+			if ($remoteapp == "vdr")
+	                        $channum = vdrgetchannum($channame);
+			else
+				$channum = 0;
                         break;
                 case 'rec':
-                        list($channame, $title, $desc, $recorded) = vdrgetrecinfo($url);
+			if ($remoteapp == "vdr")
+	                        list($channame, $title, $desc, $recorded) = vdrgetrecinfo($url);
                         break;
                 default:
                         $channame = "";
@@ -192,13 +196,15 @@ function sessiondelete($session)
 
 function sessiongetinfo($session)
 {
+	global $remoteapp;
+
 	$info = array();
 
 	addlog("Getting info for session " .$session);
 
 	// Get some info
 	list($type, $mode, $url, $channame) = readinfostream($session);
-	
+
 	// Fill common info
 	$info['session'] = $session;
 	$info['type'] = $type;
@@ -215,13 +221,17 @@ function sessiongetinfo($session)
 	{
 		case 'tv':
 			$info['name'] = $channame;
-			$channum = vdrgetchannum($channame);
-			list($date, $info['now_time'], $info['now_title'], $info['now_desc']) = vdrgetepgat($channum, "now");
-			list($date, $info['next_time'], $info['next_title'], $info['next_desc']) = vdrgetepgat($channum, "next");
+			if ($remoteapp == "vdr")
+			{
+				$channum = vdrgetchannum($channame);
+				list($date, $info['now_time'], $info['now_title'], $info['now_desc']) = vdrgetepgat($channum, "now");
+				list($date, $info['next_time'], $info['next_title'], $info['next_desc']) = vdrgetepgat($channum, "next");
+			}
 			break;
 		case 'rec':
 			$info['channel'] = $channame;
-			list($channame, $info['name'], $info['desc'], $info['recorded']) = vdrgetrecinfo($url);
+			if ($remoteapp == "vdr")
+				list($channame, $info['name'], $info['desc'], $info['recorded']) = vdrgetrecinfo($url);
 			break;
 		case 'vid':
 			$infovid = mediagetinfostream($url);
