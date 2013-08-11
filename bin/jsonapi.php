@@ -3,7 +3,7 @@
 function getGlobals()
 {
 	global $mediasource, $videosource, $audiosource;
-	global $enablevdr, $enablemediavideo, $enablemediaaudio, $vdrepgmaxdays;
+	global $enablemediavideo, $enablemediaaudio, $epgmaxdays;
 
 	$ret = array();
 	if ($enablemediavideo)
@@ -14,7 +14,7 @@ function getGlobals()
 		$ret['audio_path'] = $audiosource;
 	else
 		$ret['audio_path'] = "";
-	$ret['epg_maxdays'] = $vdrepgmaxdays;
+	$ret['epg_maxdays'] = $epgmaxdays;
 
 	return json_encode($ret);
 }
@@ -22,8 +22,8 @@ function getGlobals()
 function getTvCat()
 {
 	$ret = array();
-	$ret['categories'] = vdrgetcategories();
-	
+	$ret['categories'] = getcategories();
+
 	return json_encode($ret);
 }
 
@@ -32,7 +32,7 @@ function getFullChanList()
 	$catlist = array();
 
 	// Get all categories
-	$categories = vdrgetcategories();
+	$categories = getcategories();
 
 	// For all categories
 	$count = count($categories);
@@ -41,7 +41,7 @@ function getFullChanList()
 		$tmpcat = array();
 
 		$tmpcat['name'] = $categories[$i]['name'];
-		$tmpcat['channel'] = vdrgetchannels($tmpcat['name'], 0);
+		$tmpcat['channel'] = getchannels($tmpcat['name']);
 
 		$catlist[] = $tmpcat;
 	}
@@ -55,26 +55,42 @@ function getFullChanList()
 function getTvChan($cat)
 {
 	$ret = array();
-	$ret['channel'] = vdrgetchannels($cat, 1);
+	$ret['channel'] = getchannels($cat);
 
 	return json_encode($ret);
 }
 
 function getChanInfo($channame)
 {
+	global $remoteapp;
+
 	$ret = array();
-	
-	$ret['program'] = vdrgetchaninfo($channame);
+
+	if ($remoteapp == "vdr")
+		$ret['program'] = vdrgetchaninfo($channame);
+	else
+	{
+		$info['name'] = $channame;
+		$info['number'] = 0;
+		list($info['now_time'], $info['now_title'], $info['now_desc']) = array('', '', '');
+		list($info['next_time'], $info['next_title'], $info['next_desc']) = array('', '', '');
+
+		$ret['program'] = $info;
+	}
 
 	return json_encode($ret);
 }
 
 function getRecInfo($rec)
 {
+	global $remoteapp;
+
 	$ret = array();
 
 	$info = array();
-	list($info['channel'], $info['name'], $info['desc'], $info['recorded']) = vdrgetrecinfo($rec);
+
+	if ($remoteapp == "vdr")
+		list($info['channel'], $info['name'], $info['desc'], $info['recorded']) = vdrgetrecinfo($rec);
 
 	$ret['program'] = $info;
 
@@ -134,23 +150,32 @@ function getStreamStatus($session, $prevmsg)
 
 function getTimers()
 {
+	global $remoteapp;
+
 	$ret = array();
 
-	$ret['timer'] = vdrlisttimers();
+	if ($remoteapp == "vdr")
+		$ret['timer'] = vdrlisttimers();
 
 	return json_encode($ret);
 }
 
 function delTimer($id)
 {
-	$ret = vdrdeltimer($id);
+	global $remoteapp;
+
+	if ($remoteapp == "vdr")
+		$ret = vdrdeltimer($id);
 
         return json_encode($ret);
 }
 
 function editTimer($id, $name, $active, $channumber, $date, $starttime, $endtime)
 {
-	$ret = vdrsettimer($id, $channumber, $date, $starttime, $endtime, $name, $active);
+	global $remoteapp;
+
+	if ($remoteapp == "vdr")
+		$ret = vdrsettimer($id, $channumber, $date, $starttime, $endtime, $name, $active);
 
 	return json_encode($ret);
 }
@@ -186,18 +211,24 @@ function streamAudio($path, $file)
 
 function getEpg($channel, $time, $day, $programs)
 {
+	global $remoteapp;
+
 	$ret = array();
 
-	$ret['category'] = vdrgetepg($channel, $time, $day, $programs, 0);
+	if ($remoteapp == "vdr")
+		$ret['category'] = vdrgetepg($channel, $time, $day, $programs, 0);
 
 	return json_encode($ret);
 }
 
 function getEpgInfo($channel, $time, $day)
 {
+	global $remoteapp;
+
 	$ret = array();
 
-	$ret['program'] = vdrgetepg($channel, $time, $day, 1, 1);
+	if ($remoteapp == "vdr")
+		$ret['program'] = vdrgetepg($channel, $time, $day, 1, 1);
 
 	return json_encode($ret);
 }

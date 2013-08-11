@@ -23,13 +23,18 @@
 	$sqlpassword="password";	// SQL password
 	$sqldatabase="streambox";	// SQL database name
 
-	// VDR configuration
-	$vdrchannels='/etc/vdr/channels.conf';			// VDR channel list
-	$svdrpport=2001;					// SVDRP port
-	$svdrpip='127.0.0.1';					// SVDRP ip
-	$vdrstreamdev='http://127.0.0.1:3000/TS/';		// VDR streamdev URL
-	$vdrrecpath='/video/';					// VDR recording directory
-	$vdrepgmaxdays=10;					// Number of days to get from EPG
+        // Streaming parameters
+        $remoteapp='tvheadend';					// Choose between vdr and tvheadend
+        $channels='/etc/vdr/channels.conf';			// VDR channel list
+        $streamingurl='http://127.0.0.1:3000/TS/';		// VDR streamdev URL
+        $recpath='/video/';					// VDR recording directory
+        $epgmaxdays=10;						// Number of days to get from EPG
+
+        // VDR specific
+        $svdrpport=2001;					// SVDRP port
+        $svdrpip='127.0.0.1';					// SVDRP ip
+
+	// TVHeadend
 
 	// Media configuration
 	$videotypes='avi mkv ts mov mp4 wmv flv mpg mpeg mpeg2 mpv ';	// Supported video extensions (must finish with a space)

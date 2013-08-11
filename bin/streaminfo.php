@@ -4,8 +4,8 @@
 /*
   Types:
 	none : Not running
-	tv : VDR live
-	rec : VDR recording
+	tv : live
+	rec : recording
 	vid : Media
 */
 

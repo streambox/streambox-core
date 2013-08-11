@@ -95,7 +95,7 @@ function sec2hms ($sec, $padHours = false)
 
 function isurlvalid($url, $type)
 {
-	global $vdrstreamdev, $vdrrecpath, $videosource, $audiosource;
+	global $videosource, $audiosource;
 
 	switch ($type)
 	{
@@ -191,6 +191,149 @@ function is_pid_running($pidfile, $pidindex=1)
 		return 0;
 
 	return $output1[0];
+}
+
+function getcategories()
+{
+	global $channels, $username;
+
+	addlog("APP: getcategories()");
+
+	$catlist = array();
+
+	if (!file_exists($channels))
+	{
+		addlog("Error: can't find channels file " .$channels);
+		print "Error: channels file not found";
+		return $catlist;
+	}
+
+	$fp = fopen ($channels,"r");
+	if (!$fp)
+	{
+		addlog("Error: can't open channels file " .$channels);
+		print "Unable to open channels file";
+		return $catlist;
+	}
+
+	$rights = sqlgetuserinfo("rights", $username);
+
+	$curcat = "";
+	$curcatchancount = 0;
+
+	while ($line = fgets($fp, 1024))
+	{
+		// Check if it is a categorie
+		if ($line[0] == ":")
+		{
+			// Close current category
+			if ($curcat != "")
+			{
+				$tmpcat = array();
+				$tmpcat['name'] = $curcat;
+				$tmpcat['channels'] = $curcatchancount;
+				$catlist[] = $tmpcat;
+
+				$curcatchancount = 0;
+			}
+
+			// Remove : and @
+			$curcat = substr($line, 1, -1);
+			if($curcat[0] == '@')
+			{
+				$catarray = explode(' ', $curcat);
+				$curcat = substr($curcat, strlen($catarray[0])+1);
+			}
+
+			// Check rights
+			if (strstr($rights,$curcat) == "")
+			{
+				$curcat="";
+				continue;
+			}
+
+			if (!is_utf8($curcat))
+				$curcat = utf8_encode($curcat);
+		}
+		else if ($line[0] != "")
+			$curcatchancount++;
+	}
+
+	// Close last cat
+	if ($curcat != "")
+	{
+		$tmpcat = array();
+		$tmpcat['name'] = $curcat;
+		$tmpcat['channels'] = $curcatchancount;
+		$catlist[] = $tmpcat;
+	}
+
+	fclose($fp);
+
+	return $catlist;
+}
+
+function getchannels($category, $now)
+{
+	global $channels;
+
+	addlog("APP: getchannels(category=" .$category .")");
+
+	$chanlist=array();
+
+	if (!file_exists($channels))
+	{
+		addlog("Error: can't find channels file " .$channels);
+		print "Error: channels file not found";
+		return $chanlist;
+	}
+
+	$fp = fopen ($channels,"r");
+	if (!$fp)
+	{
+		addlog("Error: can't open channels file " .$channels);
+		print "Unable to open channels file";
+		return $chanlist;
+	}
+
+	$cat_found = 0;
+
+	while ($line = fgets($fp, 1024))
+	{
+		if (!$cat_found)
+		{
+			if ($line[0] != ":")
+				continue;
+
+			// Get category name
+			$cat = substr($line, 1, -1);
+			if (!is_utf8($cat))
+				$cat = utf8_encode($cat);
+
+			if ($cat == $category)
+				$cat_found = 1;
+		}
+		else if ($line[0] != "")
+		{
+			if ($line[0] == ":")
+				break;
+
+			$channame = substr($line, 0, -1);
+
+			$tmpchan = array();
+			$tmpchan['name'] = $channame;
+			$tmpchan['number'] = 0; //vdrgetchannum($channame);
+
+			if (!is_utf8($tmpchan['name']))
+				$tmpchan['name'] = utf8_encode($tmpchan['name']);
+
+			$chanlist[] = $tmpchan;
+		}
+	}
+
+	fclose($fp);
+
+	return $chanlist;
 }
 
 ?>

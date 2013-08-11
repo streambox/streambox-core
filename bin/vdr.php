@@ -17,190 +17,6 @@ function vdrsendcommand($cmd)
 	return $ret;
 }
 
-function vdrgetcategories()
-{
-	global $vdrchannels, $username;
-
-	addlog("VDR: vdrgetcategories()");
-
-	$catlist = array();
-
-	if (!file_exists($vdrchannels))
-	{
-		addlog("Error: can't find vdr channels file " .$vdrchannels);
-		print "Error: channels file not found";
-		return $catlist;
-	}
-
-	$fp = fopen ($vdrchannels,"r");
-	if (!$fp)
-	{
-		addlog("Error: can't open vdr channels file " .$vdrchannels);
-		print "Unable to open channels file";
-		return $catlist;
-	}
-
-	$rights = sqlgetuserinfo("rights", $username);
-
-	$curcat = "";
-	$curcatchancount = 0;
-
-	while ($line = fgets($fp, 1024))
-	{
-		// Check if it is a categorie
-		if ($line[0] == ":")
-		{
-			// Close current category
-			if ($curcat != "")
-			{
-				$tmpcat = array();
-				$tmpcat['name'] = $curcat;
-				$tmpcat['channels'] = $curcatchancount;
-				$catlist[] = $tmpcat;
-
-				$curcatchancount = 0;
-			}
-
-			// Remove : and @
-			$curcat = substr($line, 1, -1);
-			if($curcat[0] == '@')
-			{
-				$catarray = explode(' ', $curcat);
-				$curcat = substr($curcat, strlen($catarray[0])+1);
-			}
-
-			// Check rights
-			if (strstr($rights,$curcat) == "")
-			{
-				$curcat="";
-				continue;
-			}
-
-			if (!is_utf8($curcat))
-				$curcat = utf8_encode($curcat);
-		}
-		else if ($line[0] != "")
-			$curcatchancount++;
-	}
-
-	// Close last cat
-	if ($curcat != "")
-	{
-		$tmpcat = array();
-		$tmpcat['name'] = $curcat;
-		$tmpcat['channels'] = $curcatchancount;
-		$catlist[] = $tmpcat;
-	}
-
-	fclose($fp);
-
-	return $catlist;
-}
-
-function vdrgetchannels($category, $now)
-{
-	global $vdrchannels;
-
-	addlog("VDR: vdrgetchannels(category=" .$category .", now=" .$now .")");
-
-	$chanlist=array();
-
-	if (!file_exists($vdrchannels))
-	{
-		addlog("Error: can't find vdr channels file " .$vdrchannels);
-		print "Error: channels file not found";
-		return $chanlist;
-	}
-
-	$fp = fopen ($vdrchannels,"r");
-	if (!$fp)
-	{
-		addlog("Error: can't open vdr channels file " .$vdrchannels);
-		print "Unable to open channels file";
-		return $chanlist;
-	}
-
-	$cat_found = 0;
-
-	// Get NOW epg
-	if ($now)
-		$epgnow = vdrsendcommand("LSTE NOW");
-
-	while ($line = fgets($fp, 1024))
-	{
-		if (!$cat_found)
-		{
-			if ($line[0] != ":")
-				continue;
-
-			// Get category name
-			$cat = substr($line, 1, -1);
-			if (!is_utf8($cat))
-				$cat = utf8_encode($cat);
-
-			if ($cat == $category)
-				$cat_found = 1;
-		}
-		else if ($line[0] != "")
-		{
-			if ($line[0] == ":")
-				break;
-
-			$channame = substr($line, 0, -1);
-
-			$tmpchan = array();
-			$tmpchan['name'] = $channame;
-			$tmpchan['number'] = vdrgetchannum($channame);
-			if ($now)
-			{
-				// Extract now
-				$chanfound = 0;
-				$count = count($epgnow);
-				$info = "";
-				for ($i = 0; $i < $count; $i++)
-				{
-					// Find the right chan (take the first one)
-					if ($chanfound == 0)
-					{
-						if (strstr($epgnow[$i], $channame) == $channame)
-							$chanfound = 1;
-					}
-					else
-					{
-						// Now find T or C
-						if(ereg("^C", $epgnow[$i]))
-						{
-							if (!strstr($epgnow[$i], $channame) == $channame)
-							{
-								$chanfound = 0;
-								continue;
-							}
-						}
-						else if(ereg("^T", $epgnow[$i]))
-						{
-							$info=substr($epgnow[$i], 2);
-							if (!is_utf8($info))
-								$info = utf8_encode($info);
-							break;
-						}
-					}
-				}
-
-				$tmpchan['now_title'] = $info;
-			}
-
-			if (!is_utf8($tmpchan['name']))
-				$tmpchan['name'] = utf8_encode($tmpchan['name']);
-
-			$chanlist[] = $tmpchan;
-		}
-	}
-
-	fclose($fp);
-
-	return $chanlist;
-}
-
 function vdrgetchannum($chan)
 {
 	addlog("VDR: vdrgetchannum(chan=" .$chan .")");
@@ -233,52 +49,6 @@ function vdrgetchanname($channum)
 		$channame = utf8_encode($channame);
 
 	return $channame;
-}
-
-function vdrgetchancat($channame)
-{
-	global $vdrchannels;
-
-	addlog("VDR: vdrgetchancat(channame=" .$channame .")");
-
-	if (!file_exists($vdrchannels))
-	{
-		addlog("Error: can't find vdr channels file " .$vdrchannels);
-		return "";
-	}
-
-	$fp = fopen ($vdrchannels,"r");
-	if (!fp)
-	{
-		addlog("Error: can't open vdr channels file " .$vdrchannels);
-		return "";
-	}
-
-	$cat = "";
-
-	while ($line = fgets($fp, 1024))
-	{
-		if ($line[0] == ":")
-		{
-			$cat = substr($line, 1, -1);
-			if($cat[0] == '@')
-			{
-				$catarray = explode(' ', $cat);
-				$cat = substr($cat, strlen($catarray[0])+1);
-			}
-			if (!is_utf8($cat))
-				$cat = utf8_encode($cat);
-
-			continue;
-		}
-
-		$name = explode(":", $line);
-		$name = explode(";", $name[0]);
-		if ($name[0] == $channame)
-			break;
-	}
-
-	return $cat;
 }
 
 function vdrgetchaninfo($channame)
@@ -350,14 +120,14 @@ function vdrgetfullepgat($channel, $at, $programs, $requestedday)
 	$epgout = array();
 
 	// Generate the epgout
-	$categories = vdrgetcategories();
+	$categories = getcategories();
 	for ($i=0; $i<count($categories); $i++)
 	{
 		$catentry = array();
 		$catentry['name'] = $categories[$i]['name'];
 		$catentry['channel'] = array();
 
-		$channels = vdrgetchannels($categories[$i]['name'], 0);
+		$channels = getchannels($categories[$i]['name']);
 
 		for ($j=0; $j<count($channels); $j++)
 		{
@@ -506,16 +276,16 @@ function vdrgetepg($channel, $time, $day, $programs, $extended)
 
 function vdrgetrecinfo($rec)
 {
-	global $vdrrecpath;
+	global $recpath;
 
 	addlog("VDR: vdrgetrecinfo(rec=" .$rec .")");
 
-	$infofile = $vdrrecpath .$rec ."/info";
+	$infofile = $recpath .$rec ."/info";
 	if (file_exists($infofile))
 		$info= file_get_contents($infofile);
 	else
 	{
-		$infofile = $vdrrecpath .$rec ."/info.vdr";
+		$infofile = $recpath .$rec ."/info.vdr";
 		if (file_exists($infofile))
 			$info= file_get_contents($infofile);
 		else

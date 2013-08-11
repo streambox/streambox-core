@@ -2,7 +2,7 @@
 function sessioncreate($type, $url, $mode)
 {
 	global $httppath, $ffmpegpath, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
-	global $username, $vdrstreamdev, $vdrrecpath;
+	global $username, $streamingurl, $recpath;
 	global $qualities;
 
 	$log = "user [" .$username ."]"." Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")";
@@ -100,11 +100,11 @@ function sessioncreate($type, $url, $mode)
 	switch ($type)
 	{
 		case 'tv':
-			$scripturl = $vdrstreamdev .$url;
+			$scripturl = $streamingurl .$url;
 			$scriptnbsegments = 5;
 			break;
 		case 'rec':
-			$scripturl = $vdrrecpath .$url;
+			$scripturl = $recpath .$url;
 			$scriptnbsegments = 1260;
 			break;
 		case 'vid':

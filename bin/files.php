@@ -90,7 +90,7 @@ function mediagentb($stream, $dest)
 
 function filegettype($file)
 {
-	global $videotypes, $audiotypes, $vdrrecpath;
+	global $videotypes, $audiotypes, $recpath;
 
 	// Get file extension
 	$fileext = end(explode(".", $file));
@@ -98,7 +98,7 @@ function filegettype($file)
 
 	if (is_dir($file))
 	{
-		if (substr($file, 0, strlen($vdrrecpath)) == $vdrrecpath)
+		if (substr($file, 0, strlen($recpath)) == $recpath)
 			return 'rec';
 		else
 			return 'folder';
@@ -174,14 +174,14 @@ function generatelogo($type, $name, $dest)
 
 function filesgetlisting($dir, $type)
 {
-	global $username, $vdrrecpath, $videosource, $audiosource;
+	global $username, $recpath, $videosource, $audiosource;
 
 	addlog("Listing for type " .$type ." dir: " .$dir);
 
 	switch ($type)
 	{
 		case "rec":
-			$predir = $vdrrecpath;
+			$predir = $recpath;
 			break;
 		case "vid":
 			$predir = $videosource;
