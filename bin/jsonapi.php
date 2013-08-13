@@ -55,7 +55,7 @@ function getFullChanList()
 function getTvChan($cat)
 {
 	$ret = array();
-	$ret['channel'] = getchannels($cat);
+	$ret['channel'] = getchannels($cat, 1);
 
 	return json_encode($ret);
 }
@@ -66,17 +66,7 @@ function getChanInfo($channame)
 
 	$ret = array();
 
-	if ($remoteapp == "vdr")
-		$ret['program'] = vdrgetchaninfo($channame);
-	else
-	{
-		$info['name'] = $channame;
-		$info['number'] = 0;
-		list($info['now_time'], $info['now_title'], $info['now_desc']) = array('', '', '');
-		list($info['next_time'], $info['next_title'], $info['next_desc']) = array('', '', '');
-
-		$ret['program'] = $info;
-	}
+	$ret['program'] = stubgetchaninfo($channame);
 
 	return json_encode($ret);
 }

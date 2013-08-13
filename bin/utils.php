@@ -323,6 +323,11 @@ function getchannels($category, $now)
 			$tmpchan = array();
 			$tmpchan['name'] = $channame;
 			$tmpchan['number'] = 0; //vdrgetchannum($channame);
+			if ($now)
+			{
+				$info = stubgetchaninfo($channame);
+				$tmpchan['now_title'] = $info['now_title'];
+			}
 
 			if (!is_utf8($tmpchan['name']))
 				$tmpchan['name'] = utf8_encode($tmpchan['name']);

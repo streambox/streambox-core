@@ -23,6 +23,7 @@ include ('./debug.php');
 include ('./sql.php');
 include ('./auth.php');
 include ('../getid3/getid3.php');
+include ('./stub.php');
 include ('./utils.php');
 include ('./files.php');
 include ('./streaminfo.php');
