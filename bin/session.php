@@ -18,14 +18,10 @@ function sessioncreate($type, $url, $mode)
         {
                 case 'tv':
                         $channame = $url;
-			if ($remoteapp == "vdr")
-	                        $channum = vdrgetchannum($channame);
-			else
-				$channum = 0;
+                        $channum = stubgetchannum($channame);
                         break;
                 case 'rec':
-			if ($remoteapp == "vdr")
-	                        list($channame, $title, $desc, $recorded) = vdrgetrecinfo($url);
+			list($channame, $title, $desc, $recorded) = stubgetrecinfo($url);
                         break;
                 default:
                         $channame = "";
@@ -221,17 +217,13 @@ function sessiongetinfo($session)
 	{
 		case 'tv':
 			$info['name'] = $channame;
-			if ($remoteapp == "vdr")
-			{
-				$channum = vdrgetchannum($channame);
-				list($date, $info['now_time'], $info['now_title'], $info['now_desc']) = vdrgetepgat($channum, "now");
-				list($date, $info['next_time'], $info['next_title'], $info['next_desc']) = vdrgetepgat($channum, "next");
-			}
+			$channum = stubgetchannum($channame);
+			list($date, $info['now_time'], $info['now_title'], $info['now_desc']) = stubgetepgat($channum, "now");
+			list($date, $info['next_time'], $info['next_title'], $info['next_desc']) = stubgetepgat($channum, "next");
 			break;
 		case 'rec':
 			$info['channel'] = $channame;
-			if ($remoteapp == "vdr")
-				list($channame, $info['name'], $info['desc'], $info['recorded']) = vdrgetrecinfo($url);
+			list($channame, $info['name'], $info['desc'], $info['recorded']) = stubgetrecinfo($url);
 			break;
 		case 'vid':
 			$infovid = mediagetinfostream($url);

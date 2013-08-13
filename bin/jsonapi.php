@@ -79,8 +79,7 @@ function getRecInfo($rec)
 
 	$info = array();
 
-	if ($remoteapp == "vdr")
-		list($info['channel'], $info['name'], $info['desc'], $info['recorded']) = vdrgetrecinfo($rec);
+	list($info['channel'], $info['name'], $info['desc'], $info['recorded']) = stubgetrecinfo($rec);
 
 	$ret['program'] = $info;
 
@@ -144,8 +143,7 @@ function getTimers()
 
 	$ret = array();
 
-	if ($remoteapp == "vdr")
-		$ret['timer'] = vdrlisttimers();
+	$ret['timer'] = stublisttimers();
 
 	return json_encode($ret);
 }
@@ -154,8 +152,7 @@ function delTimer($id)
 {
 	global $remoteapp;
 
-	if ($remoteapp == "vdr")
-		$ret = vdrdeltimer($id);
+	$ret = stubdeltimer($id);
 
         return json_encode($ret);
 }
@@ -164,8 +161,7 @@ function editTimer($id, $name, $active, $channumber, $date, $starttime, $endtime
 {
 	global $remoteapp;
 
-	if ($remoteapp == "vdr")
-		$ret = vdrsettimer($id, $channumber, $date, $starttime, $endtime, $name, $active);
+	$ret = stubsettimer($id, $channumber, $date, $starttime, $endtime, $name, $active);
 
 	return json_encode($ret);
 }
@@ -205,8 +201,7 @@ function getEpg($channel, $time, $day, $programs)
 
 	$ret = array();
 
-	if ($remoteapp == "vdr")
-		$ret['category'] = vdrgetepg($channel, $time, $day, $programs, 0);
+	$ret['category'] = stubgetepg($channel, $time, $day, $programs, 0);
 
 	return json_encode($ret);
 }
@@ -217,8 +212,7 @@ function getEpgInfo($channel, $time, $day)
 
 	$ret = array();
 
-	if ($remoteapp == "vdr")
-		$ret['program'] = vdrgetepg($channel, $time, $day, 1, 1);
+	$ret['program'] = stubgetepg($channel, $time, $day, 1, 1);
 
 	return json_encode($ret);
 }

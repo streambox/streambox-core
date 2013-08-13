@@ -322,7 +322,7 @@ function getchannels($category, $now)
 
 			$tmpchan = array();
 			$tmpchan['name'] = $channame;
-			$tmpchan['number'] = 0; //vdrgetchannum($channame);
+			$tmpchan['number'] = stubgetchannum($channame);
 			if ($now)
 			{
 				$info = stubgetchaninfo($channame);
