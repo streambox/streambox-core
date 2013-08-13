@@ -23,7 +23,7 @@ function stubgetchannum($chan)
 	global $remoteapp;
 
 	if ($remoteapp == "vdr")
-		return vdrgetchannum($channame);
+		return vdrgetchannum($chan);
 	else if ($remoteapp == "tvheadend")
 		return 0;
 }
