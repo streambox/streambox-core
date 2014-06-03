@@ -64,7 +64,15 @@ function getChanInfo($channame)
 {
 	$ret = array();
 	
-	$ret['program'] = vdrgetchaninfo($channame);
+        if (strpos($channame, " (VLC)"))
+        {
+                $ret['program']['name'] = $channame;
+                $ret['program']['number'] = 0;
+                $ret['program']['now_title'] = $channame ." programs";
+                $ret['program']['next_title'] = $channame ." programs";
+        }
+        else
+		$ret['program'] = vdrgetchaninfo($channame);
 
 	return json_encode($ret);
 }

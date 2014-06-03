@@ -100,7 +100,14 @@ function sessioncreate($type, $url, $mode)
 	switch ($type)
 	{
 		case 'tv':
-			$scripturl = $vdrstreamdev .$url;
+			$is_live=strpos($url, " (VLC)");
+			if ($is_live)
+			{
+				$url = substr($url, 0, $is_live);
+				$scripturl = "http://localhost:1234/" .$url;
+			}
+			else
+				$scripturl = $vdrstreamdev .$url;
 			$scriptnbsegments = 5;
 			break;
 		case 'rec':
@@ -215,9 +222,22 @@ function sessiongetinfo($session)
 	{
 		case 'tv':
 			$info['name'] = $channame;
-			$channum = vdrgetchannum($channame);
-			list($date, $info['now_time'], $info['now_title'], $info['now_desc']) = vdrgetepgat($channum, "now");
-			list($date, $info['next_time'], $info['next_title'], $info['next_desc']) = vdrgetepgat($channum, "next");
+		        if (strpos($channame, " (VLC)"))
+		        {
+				$channum = 0;
+				$info['now_time'] = "";
+				$info['now_title'] = $channame ." programs";
+				$info['now_desc'] = $channame ." programs";
+				$info['next_time'] = "";
+				$info['next_title'] = $channame ." programs";
+				$info['next_desc'] = $channame ." programs";
+		        }
+		        else
+			{
+				$channum = vdrgetchannum($channame);
+				list($date, $info['now_time'], $info['now_title'], $info['now_desc']) = vdrgetepgat($channum, "now");
+				list($date, $info['next_time'], $info['next_title'], $info['next_desc']) = vdrgetepgat($channum, "next");
+			}
 			break;
 		case 'rec':
 			$info['channel'] = $channame;

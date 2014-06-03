@@ -123,7 +123,7 @@ function vdrgetchannels($category, $now)
 	$cat_found = 0;
 
 	// Get NOW epg
-	if ($now)
+	if ($now && !strpos($category, "VLC"))
 		$epgnow = vdrsendcommand("LSTE NOW");
 
 	while ($line = fgets($fp, 1024))
