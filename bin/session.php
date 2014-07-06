@@ -3,7 +3,7 @@ function sessioncreate($type, $url, $mode)
 {
 	global $httppath, $ffmpegpath, $maxencodingprocesses, $ffmpegdebug, $ffmpegdebugfile, $encodingscript;
 	global $username, $vdrstreamdev, $vdrrecpath;
-	global $qualities;
+	global $qualities, $vlcurl;
 
 	$log = "user [" .$username ."]"." Creating a new session for \"" .$url ."\" (" .$type .", " .$mode .")";
 	addlog($log);
@@ -104,7 +104,7 @@ function sessioncreate($type, $url, $mode)
 			if ($is_live)
 			{
 				$url = substr($url, 0, $is_live);
-				$scripturl = "http://localhost:1234/" .$url;
+				$scripturl = $vlcurl .$url;
 			}
 			else
 				$scripturl = $vdrstreamdev .$url;
@@ -262,7 +262,7 @@ function sessiongetinfo($session)
 function sessiondeletesingle($session)
 {
 	global $username;
-  $log = "user [" .$username ."]"." Deleting session " .$session;
+ 	$log = "user [" .$username ."]"." Deleting session " .$session;
 	addlog($log);
 	addmonitoringlog($log);
 
@@ -284,9 +284,23 @@ function sessiondeletesingle($session)
 	$ffmpegpid=is_pid_running($ram ."ffmpeg.pid");
 	if ( $ffmpegpid != 0 )
 		$cmd .= " kill -9 " .$ffmpegpid ."; rm " .$ram ."ffmpeg.pid; ";
-	addlog("Sending session kill command: " .$cmd);
+
+ 	// Then kill segmenter
+ 	exec('cat ' .$ram .'segmenter.pid', $output);
+ 	$nbsegmenterpid=count($output);
+ 	for ($i=0; $i<$nbsegmenterpid; $i++)
+ 	{
+ 		$segmenterpid=is_pid_running($ram ."segmenter.pid", $i+1);
+ 		if ($segmenterpid != 0)
+ 			$cmd .= "kill -9 " .$segmenterpid ."; ";
+ 	}
+
+ 	$cmd .= "rm " .$ram ."segmenter.pid; ";
 
 	$cmd .= "rm -rf " .$ram;
+
+	addlog("Sending session kill command: " .$cmd);
+
 	exec ($cmd);
 }
 

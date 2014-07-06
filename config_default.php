@@ -31,6 +31,9 @@
 	$vdrrecpath='/video/';					// VDR recording directory
 	$vdrepgmaxdays=10;					// Number of days to get from EPG
 
+	// VLC
+	$vlcurl="http://localhost:1234/stream/";
+
 	// Media configuration
 	$videotypes='avi mkv ts mov mp4 wmv flv mpg mpeg mpeg2 mpv ';	// Supported video extensions (must finish with a space)
 	$audiotypes='mp3 aac wav ';					// Supported audio extensions
